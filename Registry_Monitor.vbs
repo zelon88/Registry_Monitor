@@ -1,12 +1,13 @@
 'File Name: Registry_Monitor.vbs
-'Version: v0.9, 8/29/2019
+'Version: v0.9.5, 9/12/2019
 'Author: Justin Grimes, 8/29/2019
 
 ' --------------------------------------------------
 Option Explicit
 Dim strKeyPath, hive, hiveItem, key, reg, arrSubKeys, subkey, objFSO, regFileHandle1, regFilePath1, regFileHandle2, regFilePath2, hiveArray, objShell, _
  objScript, scriptPath, cachePath,  RNscriptName, RNappPath, RNlogPath, companyName, companyAbbr, companyDomain, toEmail, RNmailFile, logFilePath, Path, _
- reqdDirsExists, newRegData, outputResult, strSafeDate, strSafeTime, strDateTime, logFileName, strComputerName, oShell2
+ reqdDirsExists, newRegData, outputResult, strSafeDate, strSafeTime, strDateTime, logFileName, strComputerName, oShell2, strUserName, _
+ tempHandle2
 ' --------------------------------------------------
 
   ' ----------
@@ -16,9 +17,9 @@ Dim strKeyPath, hive, hiveItem, key, reg, arrSubKeys, subkey, objFSO, regFileHan
   ' The " RNscriptName" is the filename of this script.
   RNscriptName = "Registry_Montior.vbs"
   ' The "RNappPath" is the full absolute path for the script directory, with trailing slash.
-  RNappPath = "\\SERVER\Scripts"
+  RNappPath = "C:\Users\Inspiron1525\Desktop\Registry_Montior\"
   ' The "RNlogPath" is the full absolute path for where network-wide logs are stored.
-  RNlogPath = "\\SERVER\Logs\"
+  RNlogPath = "C:\Users\Inspiron1525\Desktop\"
   ' The "companyName" the the full, unabbreviated name of your organization.
   companyName = "Company Inc."
   ' The "companyAbbr" is the abbreviated name of your organization.
@@ -27,7 +28,7 @@ Dim strKeyPath, hive, hiveItem, key, reg, arrSubKeys, subkey, objFSO, regFileHan
   ' to have been sent by "COMPUTERNAME@domain.com"
   companyDomain = "company.com"
   ' The "toEmail" is a valid email address where notifications will be sent.
-  toEmail = "IT@company.com"
+  toEmail = "zelon88@gmail.com"
   ' The "mailFile" is the full absolute path to the location where a temporary email file will be generated.
   RNmailFile = RNappPath & "Warning.mail"
   ' ----------
@@ -156,20 +157,22 @@ Function VerifyCache()
     Set tempHandle2 = objFSO.OpenTextFile(regFilePath2, 1, FALSE)
     Do Until tempHandle2.AtEndOfStream
       tempData2 = tempHandle2.ReadLine
-      If InStr(tempData1, tempData2) > 0 Then
+      If tempData2 <> tempData1 Then
         newRegData = newRegData & vbCrLf & tempData1 & " > " & tempData2
       End If
     Loop
+    If newRegData <> "" Then
+      If outputResult = TRUE Then
+        messageOutput = "The following registry keys have changed: " & vbCrLf & newRegData
+      End If
+      If emailResult = TRUE Then
+
+      End If
+      CreateRegMonLog(messageOutput)
+    End If
     'Close open files.
     tempHandle1.Close()
     tempHandle2.Close()
-    If InStr(tempData2, tempData1) > 0 Then
-      messageOutput = "The following registry keys have changed: " & vbCrLf & newRegData
-      CreateRegMonLog(messageOutput)
-      If outputResult = TRUE Then
-        WScript.Echo messageOutput
-      End If
-    End If
   Else
     objFSO.CopyFile regFilePath2, regFilePath1
   End If

@@ -1,3 +1,6 @@
+T
+T
+T
 NAME: Registry_Monitor
 
 TYPE: VBS Script
@@ -8,9 +11,9 @@ AUTHOR: Justin Grimes
 
 ORIGINAL VERSION DATE: 9/5/2019
 
-CURRENT VERSION DATE: 9/5/2019
+CURRENT VERSION DATE: 9/11/2019
 
-VERSION: v0.9
+VERSION: v0.9.5
 
 
 DESCRIPTION: An application to enumerate registry keys and look for changes which constitute an indicator of compromise.
