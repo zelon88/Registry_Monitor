@@ -1,5 +1,5 @@
 'File Name: Registry_Monitor.vbs
-'Version: v0.9.5, 9/12/2019
+'Version: v0.9.8, 9/18/2019
 'Author: Justin Grimes, 8/29/2019
 
 ' --------------------------------------------------
@@ -7,7 +7,7 @@ Option Explicit
 Dim strKeyPath, hive, hiveItem, key, reg, arrSubKeys, subkey, objFSO, regFileHandle1, regFilePath1, regFileHandle2, regFilePath2, hiveArray, objShell, _
  objScript, scriptPath, cachePath,  RNscriptName, RNappPath, RNlogPath, companyName, companyAbbr, companyDomain, toEmail, RNmailFile, logFilePath, Path, _
  reqdDirsExists, newRegData, outputResult, strSafeDate, strSafeTime, strDateTime, logFileName, strComputerName, oShell2, strUserName, _
- tempHandle2
+ tempHandle2, tempHandle1, tempData1, tempData2, emailResult, oFile, newRegDataTemp, enumerationTest, objlogFile, message, error
 ' --------------------------------------------------
 
   ' ----------
@@ -17,20 +17,24 @@ Dim strKeyPath, hive, hiveItem, key, reg, arrSubKeys, subkey, objFSO, regFileHan
   ' The " RNscriptName" is the filename of this script.
   RNscriptName = "Registry_Montior.vbs"
   ' The "RNappPath" is the full absolute path for the script directory, with trailing slash.
-  RNappPath = "C:\Users\Inspiron1525\Desktop\Registry_Montior\"
+  RNappPath = "C:\Users\USERNAME\Desktop\Registry_Montior\"
   ' The "RNlogPath" is the full absolute path for where network-wide logs are stored.
-  RNlogPath = "C:\Users\Inspiron1525\Desktop\"
+  RNlogPath = "\\SERVER\Logs\"
   ' The "companyName" the the full, unabbreviated name of your organization.
   companyName = "Company Inc."
   ' The "companyAbbr" is the abbreviated name of your organization.
   companyAbbr = "Company"
   ' The "companyDomain" is the domain to use for sending emails. Generated report emails will appear
   ' to have been sent by "COMPUTERNAME@domain.com"
-  companyDomain = "company.com"
+  companyDomain = "Company.com"
   ' The "toEmail" is a valid email address where notifications will be sent.
-  toEmail = "zelon88@gmail.com"
+  toEmail = "IT@company.com"
   ' The "mailFile" is the full absolute path to the location where a temporary email file will be generated.
   RNmailFile = RNappPath & "Warning.mail"
+  ' Send to TRUE to receive an email when registry modifications are detected. 
+  emailResult = TRUE
+  ' Send to TRUE to create a lot file when registry modifications are detected. 
+  outputResult = TRUE
   ' ----------
 
 ' --------------------------------------------------
@@ -58,7 +62,7 @@ regFilePath2 = cachePath & "unverifiedKeys.dat"
 strSafeDate = DatePart("yyyy",Date) & Right("0" & DatePart("m",Date), 2) & Right("0" & DatePart("d",Date), 2)
 strSafeTime = Right("0" & Hour(Now), 2) & Right("0" & Minute(Now), 2) & Right("0" & Second(Now), 2)
 strDateTime = strSafeDate & "-" & strSafeTime
-logFileName = RNlogPath & "\" & strComputerName & "-" & strDateTime & "-Registry_Monitor.txt"
+logFileName = RNlogPath & strComputerName & "-" & strDateTime & "-Registry_Monitor.txt"
 ' --------------------------------------------------
 
 ' --------------------------------------------------
@@ -80,12 +84,12 @@ End Function
 ' --------------------------------------------------
 'A function to restart the script with admin priviledges if required.
 Function restartAsAdmin()
-    oShell2.ShellExecute "wscript.exe", Chr(34) & WScript.ScriptFullName & Chr(34), "", "runas", 1
+  oShell2.ShellExecute "wscript.exe", Chr(34) & WScript.ScriptFullName & Chr(34), "", "runas", 1
 End Function
 ' --------------------------------------------------
 
 ' --------------------------------------------------
-'A function to create all required directories before the script can be run.
+'A function to create all required directories before the script can be run and delete any partial files that may already exist..
 Function CreateReqdDirs()
   CreateReqdDirs = FALSE
   If Not objFSO.FolderExists(cachePath) Then
@@ -97,6 +101,37 @@ Function CreateReqdDirs()
   If objFSO.FolderExistS(cachePath) And objFSO.FolderExists(RNlogPath) Then
     CreateReqdDirs = TRUE
   End If
+  If objFSO.FileExists(regFilePath2) Then
+    objFSO.DeleteFile(regFilePath2)
+  End If
+End Function
+' --------------------------------------------------
+
+' --------------------------------------------------
+'A function to create a Warning.mail file. Use to prepare an email before calling sendEmail().
+Function createEmail()
+  If oFSO.FileExists(RNmailFile) Then
+    oFSO.DeleteFile(RNmailFile)
+  End If
+  If Not oFSO.FileExists(RNmailFile) Then
+    oFSO.CreateTextFile(RNmailFile)
+  End If
+  Set oFile = oFSO.CreateTextFile(RNmailFile, True)
+  oFile.Write "To: " & toEmail & vbNewLine & "From: " & strComputerName & "@" & companyDomain & vbNewLine & _
+   "Subject: " & companyAbbr & " Registry Monitor Warning!!!" & vbNewLine & _
+   "This is an automatic email from the " & companyName & " Network to notify you that a the registry was changed on a domain workstation." & _
+   vbNewLine & vbNewLine & "Please verify that the equipment listed below is secure." & vbNewLine & _
+   vbNewLine & "USER NAME: " & strUserName & vbNewLine & "WORKSTATION: " & strComputerName & vbNewLine & _
+   "This check was generated by " & strComputerName & " and is performed when Windows boots." & vbNewLine & vbNewLine & _
+   "Script: """ & RNscriptName & """" 
+  oFile.close
+End Function
+' --------------------------------------------------
+
+' --------------------------------------------------
+'A function for running SendMail to send a prepared Warning.mail email message.
+Function sendEmail() 
+  oShell.run "c:\Windows\System32\cmd.exe /c sendmail.exe " & RNmailFile, 0, TRUE
 End Function
 ' --------------------------------------------------
 
@@ -105,7 +140,7 @@ End Function
 'Returns "True" if logFilePath exists, "False" on error.
 Function CreateRegMonLog(message)
   If message <> "" Then
-    Set objlogFile = objFSO.CreateTextFile(logFilePath, True)
+    Set objlogFile = objFSO.CreateTextFile(logFileName, True)
     objlogFile.WriteLine(message)
     objlogFile.Close
   End If
@@ -142,49 +177,48 @@ End Function
 'Once complete this function will replace the existing regFilePath1 with the regFilePath2.
 Function VerifyCache()
   newRegData = ""
-  If objFSO.FileExists(regFilePath2) Then
-    If objFSO.FileExists(regFilePath1) Then
-      objFSO.DeleteFile regFilePath1
+  'Open regFilePath1 and get data as tempData1.
+  Set tempHandle1 = objFSO.OpenTextFile(regFilePath1, 1, FALSE)
+  tempData1 = tempHandle1.ReadAll()
+  'Open regFilePath2 and get data as tempData2.
+  Set tempHandle2 = objFSO.OpenTextFile(regFilePath2, 1, FALSE)
+  Do Until tempHandle2.AtEndOfStream
+    tempData2 = tempHandle2.ReadLine
+    If InStr(tempData1, tempData2) > 0 Then
+      newRegDataTemp = newRegData & vbCrLf & tempData2
+      newRegData = newRegDataTemp
     End If
-    objFSO.CopyFile regFilePath2, regFilePath1
-    objFSO.DeleteFile regFilePath2
-  End If
-  If objFSO.FileExists(regFilePath1) Then
-    'Open regFilePath1 and get data as tempData1.
-    Set tempHandle1 = objFSO.OpenTextFile(regFilePath1, 1, FALSE)
-    tempData1 = tempHandle1.ReadAll()
-    'Open regFilePath2 and get data as tempData2.
-    Set tempHandle2 = objFSO.OpenTextFile(regFilePath2, 1, FALSE)
-    Do Until tempHandle2.AtEndOfStream
-      tempData2 = tempHandle2.ReadLine
-      If tempData2 <> tempData1 Then
-        newRegData = newRegData & vbCrLf & tempData1 & " > " & tempData2
-      End If
-    Loop
-    If newRegData <> "" Then
-      If outputResult = TRUE Then
-        messageOutput = "The following registry keys have changed: " & vbCrLf & newRegData
-      End If
-      If emailResult = TRUE Then
-
-      End If
-      CreateRegMonLog(messageOutput)
+  Loop
+  If newRegData <> "" Then
+    If outputResult = TRUE Then
+      CreateRegMonLog("The following registry keys have changed on " & strComputerName & " with user " & strUserName & ": " & vbCrLf & newRegData)
     End If
-    'Close open files.
-    tempHandle1.Close()
-    tempHandle2.Close()
-  Else
-    objFSO.CopyFile regFilePath2, regFilePath1
+    If emailResult = TRUE Then
+      createEmail()
+      sendEmail()
+    End If
   End If
+  'Close open files.
+  tempHandle1.Close()
+  tempHandle2.Close()
+  objFSO.DeleteFile regFilePath1
+  objFSO.CopyFile regFilePath2, regFilePath1
+  objFSO.DeleteFile(regFilePath2)
 End Function
 ' --------------------------------------------------
 
 ' --------------------------------------------------
 'The main logic and entry point for the script. Makes use of the functions above.
+
+'Create directories and clean up cache files.
 If CreateReqdDirs() Then
+  'Iterate through each hive and enumerate the keys within.
   For Each hiveItem In hiveArray
-    EnumerateKeys hiveItem, strKeyPath
+    enumerationTest = EnumerateKeys(hiveItem, strKeyPath)
   Next
-  VerifyCache()
+  If enumerationTest Then
+    'Compare the enumerated registry keys with the cached version and output the results.
+    VerifyCache()
+  End If
 End If
 ' --------------------------------------------------

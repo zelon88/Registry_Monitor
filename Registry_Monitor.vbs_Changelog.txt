@@ -1,9 +1,0 @@
---------------------
-COMMIT - 9/12/2019
-v0.9.5 - Working on main loop. 
-
--v0.9.5.
--Working on main loop.
--Getting ready to implement emails and arguments.
--Thinking about doing a help argument as well.
---------------------

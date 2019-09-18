@@ -1,0 +1,18 @@
+COMMIT - 9/18/2019
+v0.9.8 - Fixing bugs. Added email/logging.
+
+-v0.9.8.
+-Working out the kinks.
+-Added sendmail functions and sendmail binaries.
+-Needs testing/optimization. 
+-verifyCache() could be faster.
+
+--------------------
+COMMIT - 9/12/2019
+v0.9.5 - Working on main loop. 
+
+-v0.9.5.
+-Working on main loop.
+-Getting ready to implement emails and arguments.
+-Thinking about doing a help argument as well.
+--------------------
