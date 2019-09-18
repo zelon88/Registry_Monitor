@@ -1,6 +1,3 @@
-T
-T
-T
 NAME: Registry_Monitor
 
 TYPE: VBS Script
