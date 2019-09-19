@@ -333,7 +333,7 @@ End Function
 parseArgs()
 
 'If "force" variable is set to TRUE; bypass the elevated priviledge check.
-If force Then
+If Not force Then
   'Ensure the script has elevated priviledges. 
   If Not isUserAdmin() Then
     'Restart with elevated priviledges if needed.
