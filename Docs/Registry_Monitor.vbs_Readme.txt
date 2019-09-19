@@ -19,7 +19,7 @@ DESCRIPTION: An application to enumerate registry keys and look for changes whic
 
 
 
-PURPOSE: To detect malicious registry operations early enough that they do not cause widespread damage to company equipment.
+PURPOSE: To detect malicious registry operations early enough that they do not cause widespread damage to company equipment. To notify company IT if and when registry keys are modified on domain workstations.
 
 
 
