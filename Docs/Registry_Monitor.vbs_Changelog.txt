@@ -1,3 +1,20 @@
+COMMIT - 9/19/2019
+v1.0 - Fixed most bugs. Greatly improve performance. Add arguments.
+
+-v1.0.
+-Added arguments...
+ -e (email output), -o (log output), -v (verbose logging), -f (forced)
+-Fixed most little integration/copypasta bugs.
+-Moved the creation & destruction of unverifiedKeys.dat handle outside the EnumerateKeys() loop for a MASSIVE performance gain.
+-Cuts the time to enumerate the registry by about 1/3.
+-Added a preliminary cache check to hash verifiedKeys.dat and unverifiedKeys.dat before in-depth (line-by-line) file comparisons are done.
+-Improved the time to detect no registry changes by (an estimated) eleventy-bajillion percent.
+-Moved all cache and temp files to a subdirectory of C:\Users\USERNAME for security/organization purposes.
+-Implemented the priviledge check and automatic escalation.
+-To force the script to run without elevated priviledges; use the -f argument.
+-Vastly improved comments. Almost every piece of code is commented or described in some way.
+
+--------------------
 COMMIT - 9/18/2019
 v0.9.8 - Fixing bugs. Added email/logging.
 
