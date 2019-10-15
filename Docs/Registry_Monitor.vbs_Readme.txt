@@ -8,9 +8,9 @@ AUTHOR: Justin Grimes
 
 ORIGINAL VERSION DATE: 9/5/2019
 
-CURRENT VERSION DATE: 9/19/2019
+CURRENT VERSION DATE: 10/15/2019
 
-VERSION: v1.0
+VERSION: v1.1
 
 
 DESCRIPTION: An application to enumerate registry keys and look for changes which constitute an indicator of compromise.
@@ -19,7 +19,7 @@ DESCRIPTION: An application to enumerate registry keys and look for changes whic
 
 
 
-PURPOSE: To detect malicious registry operations early enough that they do not cause widespread damage to company equipment. To notify company IT if and when registry keys are modified on domain workstations.
+PURPOSE: To detect malicious registry operations early enough that they do not cause widespread damage to company equipment.
 
 
 

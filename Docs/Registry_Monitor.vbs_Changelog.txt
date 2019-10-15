@@ -1,4 +1,12 @@
 COMMIT - 9/19/2019
+v1.1 - Fix double forward slash. 
+
+-v1.1.
+-Fix keys & "\" & subKeys so that there are no more duplicated double slashes.
+-Will cause a false positive for all keys on first run after updating. Be prepared!
+
+--------------------
+COMMIT - 9/19/2019
 v1.0 - Fixed most bugs. Greatly improve performance. Add arguments.
 
 -v1.0.
