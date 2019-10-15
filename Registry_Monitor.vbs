@@ -228,7 +228,7 @@ Function EnumerateKeys(hive, key)
   'Enumerate the selected hive/key.
   reg.EnumKey hive, key, arrSubKeys
   'We need to keep re-opening & closing this handle so we don't interfer
-  regFileHandle2.WriteLine(hive & "\" & key)
+  regFileHandle2.WriteLine(hive & key)
   'If there is a valid subkey to enumerate we call this function again. 
   'This is how we recursively traverse the registry kitting all keys/subkeys in a hive.
   If Not IsNull(arrSubKeys) Then
@@ -277,6 +277,7 @@ Function VerifyCache()
     Loop
     'Close the "objFile" handle to "regFilePath1".
     objFile.Close
+    'Open a new "objFile" handle to "regFilePath2".
     Set objFile = objFSO.OpenTextFile(regFilePath2, 1)
     Do Until objFile.AtEndOfStream
       strLine = objFile.ReadLine
