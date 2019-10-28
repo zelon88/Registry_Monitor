@@ -8,9 +8,9 @@ AUTHOR: Justin Grimes
 
 ORIGINAL VERSION DATE: 9/5/2019
 
-CURRENT VERSION DATE: 10/15/2019
+CURRENT VERSION DATE: 10/28/2019
 
-VERSION: v1.1
+VERSION: v1.2
 
 
 DESCRIPTION: An application to enumerate registry keys and look for changes which constitute an indicator of compromise.

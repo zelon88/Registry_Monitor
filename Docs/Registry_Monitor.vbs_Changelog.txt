@@ -1,3 +1,11 @@
+--------------------
+COMMIT - 10/28/2019 - Justin Grimes 
+v1.2 - Fix sendEmail() function.
+
+-v1.2.
+-Fix sendEmail() function.
+--------------------
+
 COMMIT - 9/19/2019
 v1.1 - Fix double forward slash. 
 
